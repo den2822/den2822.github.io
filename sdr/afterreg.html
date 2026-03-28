@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    <title>🐱 KOTIKY — С ДР САНЕК! 🎉</title>
+    
+    <style>
+        /* Сброс стилей */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            /* Фон с адаптацией */
+            background: url(san.png) no-repeat center center fixed;
+            background-size: cover;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        
+        /* Адаптивный текст с анимацией */
+        .greeting {
+            color: red;
+            font-size: clamp(28px, 8vw, 64px);
+            font-family: 'Brush Script MT', 'Comic Sans MS', cursive;
+            text-align: center;
+            text-shadow: 2px 2px 6px rgba(0,0,0,0.7), 0 0 20px rgba(255,0,0,0.5);
+            margin-bottom: 25px;
+            animation: bounce 1.2s ease-in-out infinite alternate, glow 2s ease-in-out infinite;
+            line-height: 1.3;
+            padding: 10px 20px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 15px;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+        }
+        
+        @keyframes bounce {
+            from { transform: translateY(0) scale(1); }
+            to { transform: translateY(-8px) scale(1.02); }
+        }
+        
+        @keyframes glow {
+            0%, 100% { text-shadow: 2px 2px 6px rgba(0,0,0,0.7), 0 0 20px rgba(255,0,0,0.5); }
+            50% { text-shadow: 2px 2px 6px rgba(0,0,0,0.7), 0 0 40px rgba(255,100,100,0.9); }
+        }
+        
+        /* Адаптивное видео */
+        .video-container {
+            width: 100%;
+            max-width: 500px;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+            background: rgba(0,0,0,0.3);
+        }
+        
+        video {
+            display: block;
+            width: 100%;
+            height: auto;
+            border-radius: 15px;
+        }
+        
+        /* Кнопка включения звука (для iOS) */
+        .sound-btn {
+            margin-top: 15px;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(238,90,36,0.4);
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: none; /* Показываем только если нужно */
+        }
+        
+        .sound-btn:active {
+            transform: scale(0.98);
+            box-shadow: 0 2px 8px rgba(238,90,36,0.4);
+        }
+        
+        /* Индикатор загрузки */
+        .loader {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: #1a1a2e;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s, visibility 0.5s;
+        }
+        
+        .loader.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+        
+        .loader-text {
+            color: #ff6b6b;
+            font-size: 24px;
+            animation: pulse 1s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        /* Для очень маленьких экранов */
+        @media (max-width: 320px) {
+            .greeting {
+                font-size: clamp(24px, 9vw, 48px);
+                padding: 8px 15px;
+            }
+            .video-container {
+                border-radius: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Индикатор загрузки -->
+    <div class="loader" id="loader">
+        <div class="loader-text">🎁 Загрузка поздравления... 🐱</div>
+    </div>
+    
+    <!-- Текст поздравления -->
+    <p class="greeting">✨ С ДР САНЕК! ✨<br>🎉🐱💙🐱🎉</p>
+    
+    <!-- Видео с всеми атрибутами для iOS -->
+    <div class="video-container">
+        <video 
+            id="mainVideo"
+            src="Enjoykin.mp4" 
+            controls 
+            autoplay 
+            loop 
+            muted 
+            playsinline 
+            webkit-playsinline
+            preload="auto"
+            poster="san.png"
+        >
+            <p style="color:white; text-align:center; padding:20px;">
+                🎬 Ваш браузер не поддерживает видео.<br>
+                <a href="Enjoykin.mp4" download style="color:#ff6b6b;">📥 Скачать видео</a>
+            </p>
+        </video>
+    </div>
+    
+    <!-- Кнопка включения звука (появится после первого взаимодействия) -->
+    <button class="sound-btn" id="soundBtn" onclick="enableSound()">
+        🔊 Включить звук
+    </button>
+    
+    <script>
+        // Скрыть лоадер после загрузки
+        window.addEventListener('load', function() {
+            setTimeout(() => {
+                document.getElementById('loader').classList.add('hidden');
+            }, 800);
+        });
+        
+        // Обработка видео для iOS
+        const video = document.getElementById('mainVideo');
+        const soundBtn = document.getElementById('soundBtn');
+        
+        // Показываем кнопку включения звука, если видео на паузе (iOS)
+        video.addEventListener('pause', function() {
+            if (!video.muted && video.ended) {
+                soundBtn.style.display = 'none';
+            }
+        });
+        
+        // После первого касания — пробуем включить звук
+        document.addEventListener('touchstart', function enableAudio() {
+            video.muted = false;
+            video.play().then(() => {
+                soundBtn.style.display = 'none';
+            }).catch(() => {
+                // Если автоплей со звуком заблокирован — показываем кнопку
+                video.muted = true;
+                soundBtn.style.display = 'block';
+            });
+            document.removeEventListener('touchstart', enableAudio);
+        }, { once: true });
+        
+        // Функция включения звука по кнопке
+        function enableSound() {
+            video.muted = false;
+            video.play();
+            soundBtn.style.display = 'none';
+        }
+        
+        // Предзагрузка видео для плавного старта
+        if ('connection' in navigator) {
+            if (navigator.connection.saveData) {
+                video.preload = 'metadata';
+            }
+        }
+    </script>
+</body>
+</html>
